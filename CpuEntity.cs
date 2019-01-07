@@ -159,7 +159,7 @@ public class CpuEntity : EntityState {
             Debug.LogFormat("{0} Is {1} In Distance From {2}", gameObject.name, distance, m_CurrentTarget.name);
 
         if (distance > m_ChaseDistanceMin && distance < m_ChaseDistanceMax)
-            ApplyInputBasedOnVector(m_CurrentTarget.transform.position);
+            ApplyInputBasedOnVector(m_CurrentTarget.transform.position - gameObject.transform.position);
 
         else if (distance > m_ChaseDistanceMax)
             m_CurrentTarget = null;
@@ -186,8 +186,8 @@ public class CpuEntity : EntityState {
 
     private void ApplyRandomInput()
     {
-        m_CurrentInput.x += Random.Range(-0.2f, 0.3f);
-        m_CurrentInput.y += Random.Range(-0.2f, 0.3f);
+        m_CurrentInput.x += Random.Range(-0.1f, 0.2f);
+        m_CurrentInput.y += Random.Range(-0.1f, 0.2f);
 
         m_CurrentInput.x = Mathf.Min(m_CurrentInput.x, 1.0f);
         m_CurrentInput.y = Mathf.Min(m_CurrentInput.y, 1.0f);
