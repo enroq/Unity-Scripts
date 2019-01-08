@@ -39,11 +39,17 @@ public class SoundManager : MonoBehaviour
         if (m_Instance != null)
             m_Instance = this;
         else
-            throw new UnityException("You can not have more than one sound manager in the scene at a time.");
+        {
+            Destroy(this);
+            Debug.LogError
+                ("You can not have more than one sound manager in the scene at a time.");
+        }
 
         if(m_Source == null)
         {
-            Debug.LogErrorFormat("The Sound Manager Does Not Appear To Have A Sound Source");
+            Debug.LogErrorFormat("The Sound Manager Does Not Appear To Have A Sound Source; Adding Source..");
+
+            m_Source = gameObject.AddComponent<AudioSource>();
         }
 
         for(int i = m_Sounds.Count; i >= 0; i--)
@@ -56,6 +62,9 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Usage Would Go Something Like.. SoundManager.Instance.PlaySound("id");
+    /// </summary>
     public void PlaySound(string id)
     {
         if (m_AudioDictionary.ContainsKey(id))
@@ -65,13 +74,11 @@ public class SoundManager : MonoBehaviour
             Debug.LogError("The Sound Manager Does Not Contain Corresponding Sound Identity..");
     }
 
-    /// <summary>
-    /// Usage Would Go Something Like.. SoundManager.Instance.PlaySound("id");
-    /// </summary>
+
     public void PlaySound(string id, float volume)
     {
         if (m_AudioDictionary.ContainsKey(id))
-            m_Source.PlayOneShot(m_AudioDictionary[id], volum);
+            m_Source.PlayOneShot(m_AudioDictionary[id], volume);
 
         else
             Debug.LogError("The Sound Manager Does Not Contain Corresponding Sound Identity..");
