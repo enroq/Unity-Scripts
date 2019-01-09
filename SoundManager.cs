@@ -36,7 +36,7 @@ public class SoundManager : MonoBehaviour
 
     void Awake()
     {
-        if (m_Instance != null)
+        if (m_Instance == null)
             m_Instance = this;
         else
         {
@@ -52,7 +52,7 @@ public class SoundManager : MonoBehaviour
             m_Source = gameObject.AddComponent<AudioSource>();
         }
 
-        for(int i = m_Sounds.Count; i >= 0; i--)
+        for(int i = m_Sounds.Count -1; i >= 0; i--)
         {
             if(!m_AudioDictionary.ContainsKey(m_Sounds[i].SoundId))
             {

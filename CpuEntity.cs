@@ -44,7 +44,7 @@ public class CpuEntity : EntityState {
         {
             m_IsAggresive = false;
             Debug.LogError
-                ("Cpu Entity Attached To Object Without Area Of Recognition Collider. Forcing Non-Aggressiion..");
+                ("Cpu Entity Attached To Object Without Area Of Recognition Collider. Forcing Non-Aggression..");
         }
 
         ApplyRandomInput();
@@ -110,8 +110,10 @@ public class CpuEntity : EntityState {
 
         if (m_IndependentDebugging)
         {
-            Debug.LogFormat("Current Movement Magnitude: {0} | Threshold: {1}", magnitude, m_NoMoveThreshold);
-            Debug.LogFormat("Current Axis Input For {0}: {1}", gameObject.name, m_CurrentInput);
+            Debug.LogFormat
+                ("Current Movement Magnitude: {0} | Threshold: {1}", magnitude, m_NoMoveThreshold);
+            Debug.LogFormat
+                ("Current Axis Input For {0}: {1}", gameObject.name, m_CurrentInput);
         }
     }
 
@@ -120,16 +122,22 @@ public class CpuEntity : EntityState {
         if (m_CurrentTarget == null)
             return;
 
-        if (Utility.RandomBool() || Utility.RandomBool())
+        if (Utility.RandomBool())
         {
             m_WeaponState.ProcessWeaponFire();
 
             if (m_WeaponState.GetCurrentWeapon.EmissionType == EmissionType.Beam)
                 StartCoroutine(ReleaseBeam());
+
+            if (m_IndependentDebugging)
+                Debug.LogFormat("{0} Firing {1}", 
+                    gameObject.name, m_WeaponState.GetCurrentWeapon.WeaponName);
         }
 
         if (Utility.RandomBool())
             MoveTowardsEnemy();
+        else
+            MoveAwayFromEnemy();
 
         if (Utility.ExtremeBool())
             m_ComputerCell.Jump();
@@ -143,7 +151,9 @@ public class CpuEntity : EntityState {
 
     IEnumerator ReleaseBeam()
     {
-        yield return new WaitForSeconds(1.0f);
+        yield return 
+            new WaitForSeconds(1.0f);
+
         m_WeaponState.ReleaseBeam();
     }
 
@@ -159,10 +169,22 @@ public class CpuEntity : EntityState {
             Debug.LogFormat("{0} Is {1} In Distance From {2}", gameObject.name, distance, m_CurrentTarget.name);
 
         if (distance > m_ChaseDistanceMin && distance < m_ChaseDistanceMax)
-            ApplyInputBasedOnVector(m_CurrentTarget.transform.position);
+            ApplyInputBasedOnVector(m_CurrentTarget.transform.position - gameObject.transform.position);
+    }
 
-        else if (distance > m_ChaseDistanceMax)
-            m_CurrentTarget = null;
+    private void MoveAwayFromEnemy()
+    {
+        if (m_CurrentTarget == null)
+            return;
+
+        float distance =
+            (m_CurrentTarget.transform.position - gameObject.transform.position).sqrMagnitude;
+
+        if (m_IndependentDebugging)
+            Debug.LogFormat("{0} Is {1} In Distance From {2}", gameObject.name, distance, m_CurrentTarget.name);
+
+        if (distance < m_ChaseDistanceMin && distance > m_ChaseDistanceMax)
+            ApplyInputBasedOnVector((gameObject.transform.position - m_CurrentTarget.transform.position));
     }
 
     private void OnTriggerEnter(Collider other)
@@ -186,8 +208,8 @@ public class CpuEntity : EntityState {
 
     private void ApplyRandomInput()
     {
-        m_CurrentInput.x += Random.Range(-0.2f, 0.3f);
-        m_CurrentInput.y += Random.Range(-0.2f, 0.3f);
+        m_CurrentInput.x += Random.Range(-0.3f, 0.4f);
+        m_CurrentInput.y += Random.Range(-0.3f, 0.4f);
 
         m_CurrentInput.x = Mathf.Min(m_CurrentInput.x, 1.0f);
         m_CurrentInput.y = Mathf.Min(m_CurrentInput.y, 1.0f);
